@@ -1,4 +1,4 @@
-const gulp = require('gulp')
+const {series, parallel}= require('gulp')
 const concat = require('gulp-concat')
 const cssmin = require('gulp-cssmin')
 const rename = require('gulp-rename')
@@ -6,27 +6,30 @@ const uglify = require('gulp-uglify')
 const image = require('gulp-imagemin')
 const stripJs = require('gulp-strip-comments')
 const stripCss = require('gulp-strip-css-comments')
+const htmlmin = require('gulp-htmlmin')
 
 function tarefasCSS(cb) {
 
-    return gulp.src([
-            '../node_modules/bootstrap/dist/css/bootstrap.css',
-            '../node_modules/@fortawesome/fontawesome-free/css/fontawesome.css',
-            './vendor/owl/css/owl.css',
-            './vendor/jquery-ui/jquery-ui.css',
-            './src/css/style.css'
-        ])
+         gulp.src([
+            '../node_modules/jquery/dist/jquery.js',
+            '../node_modules/bootstrap/js/bootstrap.js',
+             './vendor/owl/js/owl.js',
+            './vendor/jquery-mask/jquery-mask.js',
+            './vendor/jquery-ui/jquery-ui.js',
+              './src/js/custom.js',
+       
+            ])
         .pipe(stripCss())                   // remove comentários
         .pipe(concat('styles.css'))         // mescla arquivos
         .pipe(cssmin())                     // minifica css
         .pipe(rename({ suffix: '.min'}))    // styles.min.css
         .pipe(gulp.dest('./dist/css'))      // cria arquivo em novo diretório
-
+    cd()
 }
 
-function tarefasJS(){
+function tarefasJS(callback){
 
-    return gulp.src([
+         gulp.src([
             '../node_modules/jquery/dist/jquery.js',
             '../node_modules/bootstrap/dist/js/bootstrap.js',
             './vendor/owl/js/owl.js',
@@ -58,7 +61,18 @@ function tarefasImagem(){
         }))
         .pipe(gulp.dest('./dist/images'))
 }
+//POC-Proof of Concept
+function tarefasHtml(callback){
+     gulp.src('src/*.html')
+    .pipe(htmlmin({ collapseWhitespace: true }))
+    .pipe(gulp.dest('dist'));
+
+    return callback()
+}
 
 exports.styles = tarefasCSS
 exports.scripts = tarefasJS
 exports.images = tarefasImagem
+exports.html = tarefasHtml
+
+exports.default = parallel( tarefasHTML, tarefasJS,tarefasCSS )
